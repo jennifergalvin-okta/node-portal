@@ -1,0 +1,27 @@
+{
+  "name": "node-portal",
+  "version": "1.0.0",
+  "description": "Performs Server-Side Functions for Okta Portal",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jennifergalvin-okta/node-portal"
+  },
+  "keywords": [
+    "okta",
+    "node",
+    "portal"
+  ],
+  "author": "Jennifer Galvin",
+  "license": "BSD",
+  "bugs": {
+    "url": "https://github.com/jennifergalvin-okta/node-portal/issues"
+  },
+  "dependencies": {
+    "formidable": "~1.0.17"
+  }
+}
