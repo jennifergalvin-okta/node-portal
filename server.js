@@ -3,9 +3,14 @@ var fs = require('fs');
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
+var pug = require('pug');
 
 // Create application/x-www-form-urlencoded parser
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
+
+app.set('view engine', 'pug');
+app.set('views', __dirname + '/views')
+
 
 app.use(express.static('static'));
 
@@ -24,6 +29,7 @@ app.get('/register', function (req, res) {
 app.post('/register', urlencodedParser, function (req, res) {
   
   // Prepare output in JSON format
+
   response = 
   {
 	firstName:req.body.firstName,
@@ -34,7 +40,16 @@ app.post('/register', urlencodedParser, function (req, res) {
 	
   }
   console.log(response);
+  //res.sendFile( __dirname + "/" + "results.html" );
+  res.render('register', {
+    title: 'Success',
+    message:  'User ' + req.body.emailAddress + ' registered successfully'
+  })
+
+/*
   res.end(JSON.stringify(response));
+*/
+
 
   // Insert the user into Okta
 
@@ -69,13 +84,13 @@ app.post('/register', urlencodedParser, function (req, res) {
 
     // do the POST call
     var reqPost = https.request(options, function(res) {
+	console.log("headers: ", res.headers);
         console.log("statusCode: ", res.statusCode);
-        // uncomment it for header details
-        //  console.log("headers: ", res.headers);
- 
+	
         res.on('data', function(d) {
             console.info('POST result:\n');
-            process.stdout.write(d);
+            registrationResultsJSON = d;
+	    console.info(registrationResultsJSON);
             console.info('\n\nPOST completed');
         });
     });
@@ -87,9 +102,13 @@ app.post('/register', urlencodedParser, function (req, res) {
         console.error(e);
     });
 
+ 
+    
+
+
+    
 
 })
-
 
 app.get('/storefront', function (req, res) {
   res.sendFile( __dirname + "/" + "storefront.hml" );
