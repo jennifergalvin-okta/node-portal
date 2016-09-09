@@ -141,5 +141,5 @@ var serverOptions = {
   cert: fs.readFileSync('/etc/pki/tls/certs/server.crt')
 };
 
-http.createServer(app).listen(80);
+//http.createServer(app).listen(80);
 https.createServer(serverOptions, app).listen(443);
