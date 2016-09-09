@@ -1,3 +1,4 @@
+var http = require('http');
 var https = require('https');
 var fs = require('fs');
 var express = require('express');
@@ -36,23 +37,12 @@ app.post('/register', urlencodedParser, function (req, res) {
 	lastName:req.body.lastName,
 	mobilePhone:req.body.mobilePhone,
 	emailAddress:req.body.emailAddress,
-	state:req.body.state
+	alternateEmailAddress:req.body.alternateEmailAddress,
 	
   }
-  console.log(response);
-  //res.sendFile( __dirname + "/" + "results.html" );
-  res.render('register', {
-    title: 'Success',
-    message:  'User ' + req.body.emailAddress + ' registered successfully'
-  })
-
-/*
-  res.end(JSON.stringify(response));
-*/
-
+  //console.log(response);
 
   // Insert the user into Okta
-
     var config = require('./okta_config.json');
     var postHeaders =
     {
@@ -64,7 +54,6 @@ app.post('/register', urlencodedParser, function (req, res) {
 
     var options = {
     	host : config.host, // here only the domain name
-    	// (no http/https !)
     	port : 443,
     	path : '/api/v1/users?activate=true', // the rest of the url with parameters if needed
     	method : 'POST',
@@ -78,6 +67,7 @@ app.post('/register', urlencodedParser, function (req, res) {
 	   "firstName": req.body.firstName,
 	   "lastName": req.body.lastName,
 	   "email": req.body.emailAddress,
+	   "secondEmail": req.body.alternateEmailAddress,
 	   "login": req.body.emailAddress
 	}
     });
@@ -89,8 +79,7 @@ app.post('/register', urlencodedParser, function (req, res) {
 	
         res.on('data', function(d) {
             console.info('POST result:\n');
-            registrationResultsJSON = d;
-	    console.info(registrationResultsJSON);
+            process.stdout.write(d);
             console.info('\n\nPOST completed');
         });
     });
@@ -98,30 +87,42 @@ app.post('/register', urlencodedParser, function (req, res) {
     // write the json data
     reqPost.write(userObject);
     reqPost.end();
+
+    var renderData = {}
+    if (res.statusCode == 200)  {
+  	renderData = {
+		title:  'Registration Succeeded',
+		message:  '<br>User ' + req.body.emailAddress + ' was registered successfully.  <br>Navigate <a href="http://portal.galvin.ninja">here</a> to sign in.'
+    	}
+    }
+
     reqPost.on('error', function(e) {
         console.error(e);
+  	renderData = {
+		title:  'Registration Failed',
+		message:  '<br>User ' + req.body.emailAddress + ' was not registered successfully, the error message was:  ' + e
+	}
     });
-
  
     
-
-
-    
+  res.render('results', renderData)
 
 })
 
 app.get('/storefront', function (req, res) {
+  res.sendFile( __dirname + "/" + "storefront.html" );
+
+})
+
+app.post('/storefront', function (req, res) {
   res.sendFile( __dirname + "/" + "storefront.hml" );
-
-})
-  
-
-var server = app.listen(8082, function () {
-
-  var host = server.address().address
-  var port = server.address().port
-
-  console.log("Example app listening at http://%s:%s", host, port)
-
 })
 
+
+var serverOptions = {
+  key: fs.readFileSync('/etc/pki/tls/private/server.key'),
+  cert: fs.readFileSync('/etc/pki/tls/certs/server.crt')
+};
+
+http.createServer(app).listen(80);
+https.createServer(serverOptions, app).listen(443);
