@@ -5,6 +5,8 @@ npm install http https express body-parser pug
 
 Move the okta_config.json.example file to okta_config.json and add your tenant and API key.  If you are committing this back to git or anywhere else do NOT commit this file to your public repository!
 
+Customize your landing page by altering your widget in index.html (this file is served as is, so you can update it with your tenant and update the javascript widget versions yourself over time)
+
 Then you can run it from a command line:
 
 node server.js
