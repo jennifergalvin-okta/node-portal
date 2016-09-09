@@ -1,3 +1,6 @@
+// Dependencies
+// Get these by running "npm install http https fs express body-parser pug"
+
 var http = require('http');
 var https = require('https');
 var fs = require('fs');
@@ -9,24 +12,32 @@ var pug = require('pug');
 // Create application/x-www-form-urlencoded parser
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
+// We will use pug as our template engine for create user responses
 app.set('view engine', 'pug');
 app.set('views', __dirname + '/views')
 
 
 app.use(express.static('static'));
 
+// Route for / - default page
+// sends the contends of index.html
 app.get('/', function (req, res) {
    res.sendFile( __dirname + "/" + "index.html" );
 })
 
+
+// Sends the contends of index.html
 app.get('/index.html', function (req, res) {
    res.sendFile( __dirname + "/" + "index.html" );
 })
 
+// First part of Registration - sends the contents of register.html
 app.get('/register', function (req, res) {
    res.sendFile( __dirname + "/" + "register.html" );
 })
 
+// Post of registration
+// This grabs the inputs from register.html (you must define them both there and here) and then parses them, and sends them to Okta
 app.post('/register', urlencodedParser, function (req, res) {
   
   // Prepare output in JSON format
@@ -43,6 +54,7 @@ app.post('/register', urlencodedParser, function (req, res) {
   //console.log(response);
 
   // Insert the user into Okta
+  // An example config file is included in this package for you as okta_config.json.example
     var config = require('./okta_config.json');
     var postHeaders =
     {
@@ -72,7 +84,7 @@ app.post('/register', urlencodedParser, function (req, res) {
 	}
     });
 
-    // do the POST call
+    // do the POST call to Okta
     var reqPost = https.request(options, function(res) {
 	console.log("headers: ", res.headers);
         console.log("statusCode: ", res.statusCode);
@@ -88,6 +100,7 @@ app.post('/register', urlencodedParser, function (req, res) {
     reqPost.write(userObject);
     reqPost.end();
 
+    //  Here we use the template engine pug, as our results page is basically the same, except for the title and the error messages
     var renderData = {}
     if (res.statusCode == 200)  {
   	renderData = {
@@ -104,21 +117,25 @@ app.post('/register', urlencodedParser, function (req, res) {
 	}
     });
  
-    
+
+  // Here we render the results on the template in view/results.pug.  Changing the messages above will change the content, and changing the 
+  // template file view/results.pug will change the look and feel
   res.render('results', renderData)
 
 })
 
+// Successful login langing page, sends contents of storefront.html
 app.get('/storefront', function (req, res) {
   res.sendFile( __dirname + "/" + "storefront.html" );
 
 })
 
+// Successful login langing page, sends contents of storefront.html
 app.post('/storefront', function (req, res) {
   res.sendFile( __dirname + "/" + "storefront.hml" );
 })
 
-
+// Change your ports and certificate/key for SSL here
 var serverOptions = {
   key: fs.readFileSync('/etc/pki/tls/private/server.key'),
   cert: fs.readFileSync('/etc/pki/tls/certs/server.crt')
