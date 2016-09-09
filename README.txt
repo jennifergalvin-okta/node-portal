@@ -3,7 +3,7 @@ This package has some requirements, in the same directory as the app, go ahead a
 
 npm install http https express body-parser pug
 
-Move the okta_config.json.example file to okta_config.json and add your tenant and API key.  If you are committing this back to git or anywhere else do NOT commit this file to your public repository!
+Move the okta_config.json.example file to okta_config.json and add your tenant and API key (this is only for the administrative functions like registering user, etc).  If you are committing this back to git or anywhere else do NOT commit this file to your public repository!
 
 Customize your landing page by altering your widget in index.html (this file is served as is, so you can update it with your tenant and update the javascript widget versions yourself over time)
 
