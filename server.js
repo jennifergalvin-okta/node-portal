@@ -9,6 +9,10 @@ var app = express();
 var bodyParser = require('body-parser');
 var pug = require('pug');
 
+// Require the config file
+// An example config file is included in this package for you as okta_config.json.example
+var config = require('./okta_config.json');
+
 // Create application/x-www-form-urlencoded parser
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
@@ -54,26 +58,24 @@ app.post('/register', urlencodedParser, function (req, res) {
   //console.log(response);
 
   // Insert the user into Okta
-  // An example config file is included in this package for you as okta_config.json.example
-    var config = require('./okta_config.json');
-    var postHeaders =
-    {
+  var postHeaders =
+  {
         'Accept' : 'application/json',
         'Content-Type' : 'application/json',
         'Authorization' : "SSWS " + config.apikey
-    };
+  };
 
 
-    var options = {
+  var options = {
     	host : config.host, // here only the domain name
     	port : 443,
     	path : '/api/v1/users?activate=true', // the rest of the url with parameters if needed
     	method : 'POST',
 	headers:  postHeaders
-    };
+  };
 
-    var userObject = JSON.stringify(
-    {
+  var userObject = JSON.stringify(
+  {
         "profile":
 	{
 	   "firstName": req.body.firstName,
@@ -82,7 +84,7 @@ app.post('/register', urlencodedParser, function (req, res) {
 	   "secondEmail": req.body.alternateEmailAddress,
 	   "login": req.body.emailAddress
 	}
-    });
+  });
 
     // do the POST call to Okta
     var reqPost = https.request(options, function(res) {
@@ -135,13 +137,26 @@ app.post('/storefront', function (req, res) {
   res.sendFile( __dirname + "/" + "storefront.hml" );
 })
 
-// Change your ports and certificate/key for SSL here
-/*
-var serverOptions = {
-  key: fs.readFileSync('/etc/pki/tls/private/server.key'),
-  cert: fs.readFileSync('/etc/pki/tls/certs/server.crt')
-};
-*/
+// Run the Server
+if (config.listenOnHTTP != "true")
+	{ console.log("Not configured to listen on http in config file."); }
+else
+{ 
+	http.createServer(app).listen(config.httpPort); 
+	console.log("Server listening on port " + config.httpPort);
+}
 
-http.createServer(app).listen(80);
-//https.createServer(serverOptions, app).listen(443);
+// Set SSL options here
+if (config.listenOnHTTPS != "true")
+	{ console.log("Not configured to listen on https in config file."); }
+else
+{
+	var serverOptions = {
+  		key: fs.readFileSync(config.sslKey),
+  		cert: fs.readFileSync(config.sslCert)
+	};
+	https.createServer(serverOptions, app).listen(config.httpsPort); 
+	console.log("SSL Server listening on port " + config.httpPort);
+}
+
+
