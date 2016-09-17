@@ -105,7 +105,7 @@ app.post('/register', urlencodedParser, function (req, res) {
     if (res.statusCode == 200)  {
   	renderData = {
 		title:  'Registration Succeeded',
-		message:  '<br>User ' + req.body.emailAddress + ' was registered successfully.  <br>Navigate <a href="http://portal.galvin.ninja">here</a> to sign in.'
+		message:  '<br>User ' + req.body.emailAddress + ' was registered successfully.  <br>Navigate <a href="' + config.appMain + '">here</a> to sign in.'
     	}
     }
 

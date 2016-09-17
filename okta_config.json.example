@@ -1,4 +1,5 @@
 {
+  "appMain": "https://portal.galvin.ninja",
   "host":  "jgalvin.okta.com",
   "apikey":  "blahblahblah"
 }
