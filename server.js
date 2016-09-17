@@ -136,10 +136,12 @@ app.post('/storefront', function (req, res) {
 })
 
 // Change your ports and certificate/key for SSL here
+/*
 var serverOptions = {
   key: fs.readFileSync('/etc/pki/tls/private/server.key'),
   cert: fs.readFileSync('/etc/pki/tls/certs/server.crt')
 };
+*/
 
-//http.createServer(app).listen(80);
-https.createServer(serverOptions, app).listen(443);
+http.createServer(app).listen(80);
+//https.createServer(serverOptions, app).listen(443);
