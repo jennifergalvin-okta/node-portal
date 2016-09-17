@@ -156,7 +156,7 @@ else
   		cert: fs.readFileSync(config.sslCert)
 	};
 	https.createServer(serverOptions, app).listen(config.httpsPort); 
-	console.log("SSL Server listening on port " + config.httpPort);
+	console.log("SSL Server listening on port " + config.httpsPort);
 }
 
 
