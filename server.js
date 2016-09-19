@@ -16,10 +16,12 @@ var config = require('./okta_config.json');
 // Create application/x-www-form-urlencoded parser
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
+app.use(bodyParser.json()); // for parsing application/json
+app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+
 // We will use pug as our template engine for create user responses
 app.set('view engine', 'pug');
 app.set('views', __dirname + '/views')
-
 
 app.use(express.static('static'));
 
@@ -42,20 +44,19 @@ app.get('/register', function (req, res) {
 
 // Post of registration
 // This grabs the inputs from register.html (you must define them both there and here) and then parses them, and sends them to Okta
-app.post('/register', urlencodedParser, function (req, res) {
+app.post('/register', urlencodedParser, function (req, res, next) {
   
-  // Prepare output in JSON format
-
+  // Figure out what we got
   response = 
   {
 	firstName:req.body.firstName,
 	lastName:req.body.lastName,
 	mobilePhone:req.body.mobilePhone,
-	emailAddress:req.body.emailAddress,
-	alternateEmailAddress:req.body.alternateEmailAddress,
+	email:req.body.email,
+	secondEmail:req.body.secondEmail
 	
   }
-  //console.log(response);
+  console.log(response.body);
 
   // Insert the user into Okta
   var postHeaders =
@@ -74,51 +75,74 @@ app.post('/register', urlencodedParser, function (req, res) {
 	headers:  postHeaders
   };
 
+  
+
+
   var userObject = JSON.stringify(
   {
         "profile":
 	{
 	   "firstName": req.body.firstName,
 	   "lastName": req.body.lastName,
-	   "email": req.body.emailAddress,
-	   "secondEmail": req.body.alternateEmailAddress,
-	   "login": req.body.emailAddress
+	   "email": req.body.email,
+	   "secondEmail": req.body.secondEmail,
+	   "login": req.body.email
 	}
   });
 
-    // do the POST call to Okta
-    var reqPost = https.request(options, function(res) {
-	console.log("headers: ", res.headers);
-        console.log("statusCode: ", res.statusCode);
+    // do the POST call to Okta if we're in write mode
+    if (config.appMode.indexOf("w") != -1)
+    {
+    	var reqPost = https.request(options, function(res) {
+		console.log("headers: ", res.headers);
+        	console.log("statusCode: ", res.statusCode);
 	
-        res.on('data', function(d) {
-            console.info('POST result:\n');
-            process.stdout.write(d);
-            console.info('\n\nPOST completed');
-        });
-    });
- 
-    // write the json data
-    reqPost.write(userObject);
-    reqPost.end();
+        	res.on('data', function(d) {
+            	console.info('POST result:\n');
+            	process.stdout.write(d);
+            	console.info('\n\nPOST completed');
+        	});
+    	});
+
+	// write the json data
+    	reqPost.write(userObject);
+    	reqPost.end();
+	
+    }
 
     //  Here we use the template engine pug, as our results page is basically the same, except for the title and the error messages
     var renderData = {}
-    if (res.statusCode == 200)  {
-  	renderData = {
-		title:  'Registration Succeeded',
-		message:  '<br>User ' + req.body.emailAddress + ' was registered successfully.  <br>Navigate <a href="' + config.appMain + '">here</a> to sign in.'
+    if (config.appMode.indexOf("w") == -1)
+    {
+	renderData = {
+                title:  'Registration Succeeded',
+                message:  '<br>User ' + req.body.emailAddress + ' was registered successfully.  <br>Navigate <a href="' + config.appMain + '">here</a> to sign in.'
+        }
+
+    }
+    else
+    {
+    	if (res.statusCode == 200) 
+    	{
+  		renderData = 
+		{
+			title:  'Registration Succeeded',
+			message:  '<br>User ' + req.body.emailAddress + ' was registered successfully.  <br>Navigate <a href="' + config.appMain + '">here</a> to sign in.'
+    		}
+
+    		reqPost.on('error', function(e) 
+		{
+        		console.error(e);
+        		renderData = 
+			{
+                		title:  'Registration Failed',
+                		message:  '<br>User ' + req.body.emailAddress + ' was not registered successfully, the error message was:  ' + e
+        		}
+    		});
+
     	}
     }
 
-    reqPost.on('error', function(e) {
-        console.error(e);
-  	renderData = {
-		title:  'Registration Failed',
-		message:  '<br>User ' + req.body.emailAddress + ' was not registered successfully, the error message was:  ' + e
-	}
-    });
- 
 
   // Here we render the results on the template in view/results.pug.  Changing the messages above will change the content, and changing the 
   // template file view/results.pug will change the look and feel

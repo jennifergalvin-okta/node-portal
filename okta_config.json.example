@@ -1,5 +1,6 @@
 {
   "appMain": "https://portal.galvin.ninja",
+  "appMode": "rwx",
   "httpPort": "80",
   "listenOnHTTP": "true",
   "httpsPort": "443",
