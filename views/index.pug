@@ -1,0 +1,58 @@
+html
+        head
+                title=title
+                meta(name="viewport", content="width=device-width, initial-scale=1.0")
+                meta(name="robots",  content="noarchive")
+                meta(name="robots",  content="noindex")
+                meta(name="googlebot", content="noarchive")
+                link(rel="stylesheet", href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")
+                link(rel="stylesheet", href="https://ok1static.oktacdn.com/assets/js/sdk/okta-signin-widget/1.2.0/css/okta-theme-1.2.0.css")
+                link(rel="stylesheet", href="css/custom.css")
+                script(type="text/javascript", src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js")
+                script(type="text/javascript", src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js")
+        body
+
+                div.okta-login-container
+			:javascript
+				var oktaSignIn = new OktaSignIn({
+					baseUrl: "https://jgalvin.okta.com",
+					logo: '/chiplogo_medium.png',
+					features: {
+						securityImage: true,
+						rememberMe: true,
+						smsRecovery: true,
+						selfServiceUnlock: true
+					},
+					helpLinks: {
+						custom: [
+							{ text: 'Manage Account / Factors', href: 'https://jgalvin.okta.com' },
+							{ text: 'Register for an Account', href: 'register' }
+						],
+						help: '/help.html',
+						forgotPassword:  '/forgotPassword.html',
+						unlock: '/unlock.html'
+					},
+					labels: {
+						'primaryauth.title': 'Acme Chip Login',
+						'primaryauth.username': 'Username',
+						'primaryauth.username.tooltip': 'Enter your username',
+						'primaryauth.password': 'Password',
+						'primaryauth.password.tooltip': 'Super Secret password',
+						"unlockaccount": "Unlock account?"
+					}
+				});
+
+				oktaSignIn.renderEl(
+					{ el: '#okta-login-container' },
+					function (res) {
+						if (res.status === 'SUCCESS')
+							{ res.session.setCookieAndRedirect('https://portal.galvin.ninja/storefront'); }
+						else {res.session.setCookieAndRedirect('http://i.imgur.com/METstiD.gif'); }
+					}
+				);
+
+                        div
+				center
+				a(href='https://jgalvin.okta.com/oauth2/v1/authorize?idp=0oa7fk384nZRZEk0s0x7&client_id=VWMfAm0rcZ2395eMAPBL&response_type=id_token&scope=openid%20email%20profile&redirect_uri=https://jgalvin.okta.com/app/UserHome&state=someState&nonce=someNonce'): img(src="facebook_icon.png" height="25" width="25")
+
+			
