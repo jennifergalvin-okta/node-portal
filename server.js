@@ -26,15 +26,27 @@ app.set('views', __dirname + '/views')
 app.use(express.static('static'));
 
 // Route for / - default page
-// sends the contends of index.html
 app.get('/', function (req, res) {
    res.sendFile( __dirname + "/" + "index.html" );
+
+/*
+   res.setHeader('Content-Type', 'text/html');
+   var renderData = { title:  'Acme Chip Portal' };
+   res.render('index', renderData);
+
+*/
+
 })
 
 
 // Sends the contends of index.html
 app.get('/index.html', function (req, res) {
    res.sendFile( __dirname + "/" + "index.html" );
+})
+
+app.get('/index.html.2', function (req, res) {
+   res.setHeader('Content-Type', 'text/html');
+   res.sendFile( __dirname + "/" + "index.html.2" );
 })
 
 // First part of Registration - sends the contents of register.html
