@@ -57,18 +57,49 @@ app.get('/register', function (req, res) {
 // Post of registration
 // This grabs the inputs from register.html (you must define them both there and here) and then parses them, and sends them to Okta
 app.post('/register', urlencodedParser, function (req, res, next) {
-  
-  // Figure out what we got
-  response = 
-  {
-	firstName:req.body.firstName,
-	lastName:req.body.lastName,
-	mobilePhone:req.body.mobilePhone,
-	email:req.body.email,
-	secondEmail:req.body.secondEmail
-	
+
+  // Let's output what we got
+  for (var key in req.body) 
+    { console.log(key + ": " + req.body[key]); }
+
+  // Let's check for the minimum and add it - delete what we use
+  var userObject = "{  \"profile\": { \"firstName\": \"" + req.body["firstName"] + "\"";
+  delete req.body["firstName"];
+  userObject = userObject + ", \"lastName\": \"" + req.body["lastName"] + "\"";
+  delete req.body["lastName"];
+  userObject = userObject + ", \"email\": \"" + req.body["email"] + "\"";
+ 
+  // Use email if no login is included 
+  if (req.body["login"] == null)
+    { userObject = userObject + ", \"login\": \"" + req.body["email"] + "\""; }
+  else
+  { 
+	userObject = userObject + ", \"login\": \"" + req.body["login"] + "\""; 
+	delete req.body[login];
   }
-  console.log(response.body);
+  delete req.body["email"];
+
+  // Anything else besides creds?  Let's add it to the profile
+  for (var key in req.body)
+  {
+    if (key != "password") 
+    {
+       userObject = userObject + ", \"" + key + "\": \"" + req.body[key] + "\"";
+       delete req.body[key]; 
+    }
+  }
+
+  // Close up profile
+  userObject = userObject + "}";
+
+  // If the password is passed, add it 
+  if (req.body.password != null)
+    { userObject = userObject + ", \"credentials\": { \"password\": { \"value\": \"" + req.body.password + "\" } }"; } 
+
+  // Close up JSON
+  userObject = userObject + "}";
+
+  console.log(userObject);
 
   // Insert the user into Okta
   var postHeaders =
@@ -88,20 +119,6 @@ app.post('/register', urlencodedParser, function (req, res, next) {
   };
 
   
-
-
-  var userObject = JSON.stringify(
-  {
-        "profile":
-	{
-	   "firstName": req.body.firstName,
-	   "lastName": req.body.lastName,
-	   "email": req.body.email,
-	   "secondEmail": req.body.secondEmail,
-	   "login": req.body.email
-	}
-  });
-
     // do the POST call to Okta if we're in write mode
     if (config.appMode.indexOf("w") != -1)
     {
