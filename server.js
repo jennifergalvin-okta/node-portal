@@ -68,6 +68,7 @@ app.post('/register', urlencodedParser, function (req, res, next) {
   userObject = userObject + ", \"lastName\": \"" + req.body["lastName"] + "\"";
   delete req.body["lastName"];
   userObject = userObject + ", \"email\": \"" + req.body["email"] + "\"";
+  var userEmail = req.body["email"];
  
   // Use email if no login is included 
   if (req.body["login"] == null)
@@ -145,7 +146,7 @@ app.post('/register', urlencodedParser, function (req, res, next) {
     {
 	renderData = {
                 title:  'Registration Succeeded',
-                message:  '<br>User ' + req.body.emailAddress + ' was registered successfully.  <br>Navigate <a href="' + config.appMain + '">here</a> to sign in.'
+                message:  '<br>User ' + userEmail + ' was registered successfully.  <br>Navigate <a href="' + config.appMain + '">here</a> to sign in.'
         }
 
     }
