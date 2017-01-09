@@ -33,7 +33,6 @@ app.get('/', function (req, res) {
    res.setHeader('Content-Type', 'text/html');
    var renderData = { title:  'Acme Chip Portal' };
    res.render('index', renderData);
-
 */
 
 })
@@ -95,7 +94,11 @@ app.post('/register', urlencodedParser, function (req, res, next) {
 
   // If the password is passed, add it 
   if (req.body.password != null)
-    { userObject = userObject + ", \"credentials\": { \"password\": { \"value\": \"" + req.body.password + "\" } }"; } 
+  { 
+	userObject = userObject + ", \"credentials\": { \"password\": { \"value\": \"" + req.body.password + "\" }"; 
+	userObject = userObject + ",\"recovery_question\": { \"question\": \"Who's a major player in the cowboy scene?\",";
+	userObject = userObject + "\"answer\": \"Bebop\" } } ";
+  }
 
   // Close up JSON
   userObject = userObject + "}";

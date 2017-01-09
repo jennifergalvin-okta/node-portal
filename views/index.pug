@@ -6,22 +6,24 @@ html
     meta(name="robots",  content="noindex")
     meta(name="googlebot", content="noarchive")
 
-    script(type="text/javascript", src="https://ok1static.oktacdn.com/assets/js/sdk/okta-signin-widget/1.4.0/js/okta-sign-in.min.js")
-    link(rel="stylesheet", href="https://ok1static.oktacdn.com/assets/js/sdk/okta-signin-widget/1.4.0/css/okta-sign-in.min.css")
-    link(rel="stylesheet", href="https://ok1static.oktacdn.com/assets/js/sdk/okta-signin-widget/1.4.0/css/okta-theme.css")
+    script(type="text/javascript", src="https://ok1static.oktacdn.com/assets/js/sdk/okta-signin-widget/1.7.0/js/okta-sign-in.min.js")
+    link(rel="stylesheet", href="https://ok1static.oktacdn.com/assets/js/sdk/okta-signin-widget/1.7.0/css/okta-sign-in.min.css")
+    link(rel="stylesheet", href="https://ok1static.oktacdn.com/assets/js/sdk/okta-signin-widget/1.7.0/css/okta-theme.css")
 		
     link(rel="stylesheet", href="css/custom.css")
     title=title
   body
     div.okta-login-container
+      script(type='text/javascript' src='javascript/okta-signin-widget.js')
       script(type='text/javascript').
-        var baseUrl = 'https://jgalvin.okta.com';
-        var oktaSignIn = new OktaSignIn({baseUrl: baseUrl});
-        
-        oktaSignIn.renderEl(
-          { el: '#okta-login-container' },
-          function (res) {
-            if (res.status === 'SUCCESS') { res.session.setCookieAndRedirect('https://jgalvin.okta.com'); }
-          }
-        );
+	    oktaSignIn.renderEl(
+      		{ el: '#okta-login-container' },
+      			function (res) {
+        		if (res.status === 'SUCCESS')
+        		{
+                		res.session.setCookieAndRedirect('https://portal.galvin.ninja/storefront');
+        		}
+        		else {res.session.setCookieAndRedirect('http://i.imgur.com/METstiD.gif'); }
+      		}
+    		);
 
